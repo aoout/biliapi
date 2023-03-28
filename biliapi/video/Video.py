@@ -1,35 +1,17 @@
-import requests
-
+from .Requests import getVideoUrl
+from .VideoInfo import VideoInfo
 from .VideoFormat import VideoFormat
-from .VideoQuality import VideoQuality
 
 
-def getVideoUrl(
-        avid:int,
-        bvid:int,
-        cid:int,
-        qn:VideoQuality,
-        fnval:VideoFormat,
-        fnver:int = 0,
-        fourk:int = 0,
-        session=None,
-        otype:str = "json",
-        type:str = "",
-        platform:str = "",
-):
-    return requests.get(
-        url = 'https://api.bilibili.com/x/player/playurl',
-        params=dict(
-            avid = avid,
-            bvid = bvid,
-            cid = cid,
-            qn = qn.value,
-            fnval = fnval.value,
-            fnver = fnver,
-            fourk = fourk,
-            session = session,
-            otype = otype,
-            type = type,
-            platform = platform
+class Video:
+    def __init__(self,id_:str or int) -> None:
+        self.info = VideoInfo(id_)
+
+    def getAudioUrl(self,pageIndex:int = 0) -> str:
+        response = getVideoUrl(
+            avid = self.info.av, 
+            bvid = self.info.bvid,
+            cid = self.info.cids[pageIndex],
+            fnval =  VideoFormat.DASH
         )
-    )
+        return response.json()['data']['dash']['audio'][0]['baseUrl']
